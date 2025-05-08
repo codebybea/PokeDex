@@ -11,13 +11,20 @@ body {
   text-align: center;
   background: linear-gradient(to bottom, #6ab7f5, #fff);
   min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 main {
   display: inline-block;
-  margin-top: 2%;
   padding: 15px;
   position: relative;
+}
+
+.text-main {
+  text-align: center;
+  font-weight: 700;
 }
 
 .pokedex {
@@ -91,4 +98,9 @@ main {
 .button:active {
   box-shadow: inset -4px 4px 0 #222;
   font-size: 0.9rem;
+}
+
+/* Garantir que o alerta Bootstrap não interfira */
+#alert-container {
+  z-index: 1050;
 }
