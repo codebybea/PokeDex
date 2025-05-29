@@ -1,22 +1,22 @@
-// Seleção dos elementos HTML que serão manipulados para exibir as informações do Pokémon
+// Seleção dos elementos HTML que serão manipulados para exibir informações do Pokémon
 const pokemonName = document.querySelector(".pokemon__name"); // Elemento que exibe o nome do Pokémon
 const pokemonNumber = document.querySelector(".pokemon__number"); // Elemento que exibe o número (ID) do Pokémon
-const pokemonImage = document.querySelector(".pokemon__image"); // Elemento que exibe a imagem animada do Pokémon
+const pokemonImage = document.querySelector(".pokemon__image"); // Elemento que exibe a imagem (animada ou estática) do Pokémon
 
-// Seleção dos elementos de interação do usuário (formulário e botões)
+// Seleção dos elementos de interação do usuário (formulário, campo de texto e botões)
 const form = document.querySelector(".form"); // Formulário de pesquisa
-const input = document.querySelector(".input__search"); // Campo de texto onde o usuário digita o nome ou número do Pokémon
+const input = document.querySelector(".input__search"); // Campo de texto onde o usuário digita nome ou número
 const buttonPrev = document.querySelector(".btn-prev"); // Botão "Prev" para navegar ao Pokémon anterior
 const buttonNext = document.querySelector(".btn-next"); // Botão "Next" para navegar ao próximo Pokémon
 const alertContainer = document.querySelector("#alert-container"); // Contêiner onde os alertas serão exibidos
 
 // Variáveis de controle
-let searchPokemon = 1; // ID do Pokémon atual (começa com 1)
+let searchPokemon = 1; // ID do Pokémon atual (inicia com 1, Bulbasaur)
 const MAX_POKEMON_ID = 1025; // Limite máximo de IDs na PokeAPI (total de espécies únicas)
 
 // Função assíncrona para buscar dados de um Pokémon na PokeAPI
 const fetchPokemon = async (pokemon) => {
-  // Faz uma requisição HTTP para a PokeAPI com o nome ou ID do Pokémon
+  // Faz uma requisição HTTP para a PokeAPI usando o nome ou ID do Pokémon
   const APIResponse = await fetch(
     `https://pokeapi.co/api/v2/pokemon/${pokemon}`
   );
@@ -26,7 +26,7 @@ const fetchPokemon = async (pokemon) => {
     const data = await APIResponse.json(); // Converte a resposta para JSON
     return data; // Retorna os dados do Pokémon (nome, ID, sprites, etc.)
   } else {
-    // Caso a requisição falhe
+    // Caso a requisição falhe (ex.: Pokémon não encontrado)
     if (isNaN(pokemon)) {
       // Verifica se o input é um nome (não é número)
       showAlert("Pokémon name not found, please check spelling"); // Exibe alerta para nome inválido
@@ -34,7 +34,7 @@ const fetchPokemon = async (pokemon) => {
       // Verifica se o ID é maior que o limite
       showAlert("Pokémon ID must be between 1 and 1025"); // Exibe alerta para ID inválido
     }
-    return null; // Retorna null se não encontrar o Pokémon
+    return null; // Retorna null se o Pokémon não for encontrado
   }
 };
 
@@ -96,14 +96,14 @@ const renderPokemon = async (pokemon) => {
     pokemonImage.style.display = "block"; // Exibe a imagem
     pokemonName.innerHTML = data.name; // Atualiza o nome do Pokémon na interface
     pokemonNumber.innerHTML = data.id; // Atualiza o número (ID) do Pokémon
-
-    // Define a URL da imagem animada do Pokémon (usando sprites da geração V)
-    pokemonImage.src =
+    // Tenta carregar a imagem animada; se não disponível, usa a estática
+    const animatedImage =
       data["sprites"]["versions"]["generation-v"]["black-white"]["animated"][
         "front_default"
       ];
-    input.value = ""; // Limpa o campo de pesquisa
-    searchPokemon = data.id; // Atualiza o ID do Pokémon atual
+    const staticImage = data["sprites"]["front_default"];
+    pokemonImage.src = animatedImage || staticImage; // Usa a estática como fallback
+    // Exibe um alerta se a imagem animada não estiver disponível (opcional)
   } else {
     // Caso o Pokémon não seja encontrado
     pokemonImage.style.display = "none"; // Esconde a imagem
@@ -137,4 +137,5 @@ buttonNext.addEventListener("click", () => {
   }
 });
 
+// Carrega o Pokémon inicial (ID 1) ao abrir a página
 renderPokemon(searchPokemon);
